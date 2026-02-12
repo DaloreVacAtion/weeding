@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: wedding_db
       POSTGRES_USER: wedding_user
-      POSTGRES_PASSWORD: wedding_password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wedding_password}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U wedding_user -d wedding_db"]
       interval: 5s
@@ -31,9 +31,10 @@ services:
       POSTGRES_HOST: db
       POSTGRES_DB: wedding_db
       POSTGRES_USER: wedding_user
-      POSTGRES_PASSWORD: wedding_password
-      DJANGO_DEBUG: "False"
-      ALLOWED_HOSTS: "*"
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wedding_password}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-django-insecure-change-in-production}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-False}
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost,127.0.0.1}
     depends_on:
       db:
         condition: service_healthy

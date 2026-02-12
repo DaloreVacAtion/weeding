@@ -36,7 +36,7 @@ class GuestResponseForm(forms.ModelForm):
         })
     )
     fio_plus_one = forms.CharField(
-        label='Фамилия и Имя вашего спутника/спутницы',
+        label='Фамилия и Имя Вашего спутника/спутницы',
         max_length=255,
         required=False,
         widget=forms.TextInput(attrs={
@@ -45,7 +45,7 @@ class GuestResponseForm(forms.ModelForm):
         })
     )
     will_attend = forms.TypedChoiceField(
-        label='Сможете ли вы присутствовать',
+        label='Сможете ли Вы присутствовать',
         choices=[('true', 'Да'), ('false', 'Нет')],
         coerce=lambda x: str(x).lower() == 'true',
         empty_value=False,
