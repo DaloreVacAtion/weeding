@@ -25,8 +25,8 @@ services:
       - .:/app
       - static_volume:/app/staticfiles
       - media_volume:/app/media
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"  # порт доступен только внутри сети docker
     environment:
       POSTGRES_HOST: db
       POSTGRES_DB: wedding_db
@@ -38,6 +38,19 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - static_volume:/static
+      - media_volume:/media
+    ports:
+      - "80:80"
+    #  - "443:443"        # пока закомментируй, если HTTPS не готов
+    depends_on:
+      - web
+    restart: always
 
 volumes:
   postgres_data:
