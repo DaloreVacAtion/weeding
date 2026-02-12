@@ -1,17 +1,6 @@
-# HTTP — перенаправляем на HTTPS
 server {
     listen 80;
     server_name kirillandangelina.ru www.kirillandangelina.ru;
-    return 301 https://$server_name$request_uri;
-}
-
-# HTTPS — основная работа
-server {
-    listen 443 ssl;
-    server_name kirillandangelina.ru www.kirillandangelina.ru;
-
-    ssl_certificate     /etc/nginx/ssl/live/kirillandangelina.ru/fullchain.pem;
-    ssl_certificate_key /etc/nginx/ssl/live/kirillandangelina.ru/privkey.pem;
 
     location /static/ {
         alias /static/;
