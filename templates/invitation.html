@@ -1,0 +1,472 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Приглашение на свадьбу</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --wedding-cream: #faf8f5;
+            --wedding-gold: #c9a962;
+            --wedding-sage: #9caa8a;
+            --wedding-blush: #e8d5d0;
+            --wedding-text: #4a4a4a;
+            /* Позиция кадрирования: center, center top, center 30% и т.д. */
+            --hero-focus: center center;
+        }
+        body { font-family: 'Cormorant Garamond', Georgia, serif; color: var(--wedding-text); overflow-x: hidden; font-size: 1.25rem; }
+        h2 { font-size: 2rem; }
+        h3 { font-size: 1.6rem; }
+        h5 { font-size: 1.35rem; }
+        .lead { font-size: 1.4rem; }
+        .small { font-size: 1.1rem; }
+        section { padding: 4rem 0; }
+        .hero-photo-wrap {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        /* Размытый фон — та же фотография, увеличенная и размытая */
+        .hero-photo-wrap::before {
+            content: '';
+            position: absolute;
+            inset: -15%;
+            background: url("{% static 'images/1755076780046.jpg' %}") center center no-repeat;
+            background-size: 180%;
+            filter: blur(25px);
+            z-index: 0;
+        }
+        /* Центральное фото поверх размытого фона — портретный формат (3:4) */
+        .hero-photo {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 450px;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            object-position: var(--hero-focus);
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        .event-date {
+            font-size: 2.6rem; letter-spacing: 0.2em; color: var(--wedding-gold);
+            margin-bottom: 0.5rem;
+            padding: 1rem 1.5rem;
+            background: rgba(255,255,255,0.9);
+            border-radius: 8px;
+            display: inline-block;
+        }
+        .music-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 2px solid var(--wedding-gold);
+            background: white;
+            color: var(--wedding-gold);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.3s;
+        }
+        .music-btn:hover { background: var(--wedding-gold); color: white; }
+        .music-btn.muted { opacity: 0.6; }
+        .fade-scroll { opacity: 0; transform: translateY(80px); transition: opacity 1s ease-out, transform 1s ease-out; }
+        .fade-scroll.visible { opacity: 1; transform: translateY(0); }
+        .plan-card {
+            border: 1px solid var(--wedding-blush);
+            border-radius: 12px;
+            padding: 1.5rem;
+            background: white;
+            transition: transform 0.3s;
+        }
+        .plan-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+        .plan-icon { font-size: 2rem; color: var(--wedding-gold); margin-bottom: 0.5rem; }
+        .plan-vertical { max-width: 500px; }
+        .plan-vertical-item { display: flex; gap: 1.5rem; align-items: flex-start; padding: 1.25rem 0; border-bottom: 1px solid var(--wedding-blush); }
+        .plan-vertical-item:last-child { border-bottom: none; }
+        .plan-vertical-time { font-size: 1.2rem; font-weight: 600; color: var(--wedding-gold); min-width: 100px; }
+        .plan-vertical-content { flex: 1; }
+        .countdown-box {
+            background: linear-gradient(135deg, var(--wedding-cream), var(--wedding-blush));
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+        }
+        .countdown-unit { font-size: 2.8rem; font-weight: 300; color: var(--wedding-gold); }
+        .countdown-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; }
+        .form-section { background: var(--wedding-cream); border-radius: 16px; padding: 2.5rem; }
+        .form-divider { border-color: var(--wedding-blush); opacity: 0.8; }
+        .form-check-label { cursor: pointer; }
+        .palette-img { max-width: 100%; border-radius: 8px; }
+        .dress-code-palette { max-width: 100%; max-height: 500px; width: auto; object-fit: contain; border-radius: 12px; }
+        .location-map-img { border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .location-link { color: var(--wedding-gold); text-decoration: none; font-weight: 600; }
+        .location-link:hover { text-decoration: underline; color: var(--wedding-sage); }
+        .contact-phone { color: var(--wedding-text); text-decoration: none; cursor: pointer; }
+        .contact-phone:hover { color: var(--wedding-gold); }
+        .contact-tg { color: var(--wedding-gold); text-decoration: none; font-weight: 600; }
+        .contact-tg:hover { text-decoration: underline; color: var(--wedding-sage); }
+        .music-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(250,248,245,0.98);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: opacity 0.5s;
+        }
+        .music-overlay.hidden { pointer-events: none; opacity: 0; }
+        .music-overlay-text { font-size: 1.5rem; color: var(--wedding-gold); text-align: center; padding: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="music-overlay" id="musicOverlay">
+        <p class="music-overlay-text">Нажмите, чтобы открыть приглашение<br><small class="text-muted">и увидеть красоту</small></p>
+    </div>
+    <audio id="bgMusic" loop preload="auto">
+        <source src="{% static 'audio/background.mp3' %}" type="audio/mpeg">
+    </audio>
+    <button type="button" class="music-btn" id="musicBtn" aria-label="Выключить музыку" title="Выключить музыку">
+        <i class="bi bi-music-note-beamed"></i>
+    </button>
+
+    <main class="container py-5">
+        <section class="text-center">
+            <div class="hero-photo-wrap">
+                <img class="hero-photo" src="{% static 'images/1755076780046.jpg' %}" alt="Мы">
+            </div>
+        </section>
+
+        <section class="text-center">
+            <div class="event-date">{{ event_date }}</div>
+            <p class="lead mx-auto mt-3" style="max-width: 600px;">{{ event_description }}</p>
+        </section>
+
+        <section>
+            <h2 class="text-center mb-4">План дня</h2>
+            <div class="plan-vertical mx-auto">
+                {% for item in plan_of_day %}
+                <div class="plan-vertical-item fade-scroll">
+                    <div class="plan-vertical-time">{{ item.time }}</div>
+                    <div class="plan-vertical-content">
+                        <h5 class="mb-1">{{ item.title }}</h5>
+                        <p class="small text-muted mb-0">{{ item.description }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-center mb-4">Локация</h2>
+            <p class="text-center">{{ location_description }}</p>
+            <p class="text-center">
+                <a href="{{ location_maps_link }}" target="_blank" rel="noopener" class="location-link">{{ location_address }}</a>
+            </p>
+            <div class="text-center mt-4">
+                <img src="{% static 'images/map.png' %}" alt="Карта местности" class="img-fluid rounded location-map-img" style="max-width: 100%; max-height: 850px; object-fit: contain;">
+            </div>
+        </section>
+
+        <section class="fade-scroll">
+            <h2 class="text-center mb-4">Дресс-код</h2>
+            <p class="text-center mx-auto mb-4" style="max-width: 600px;">{{ dress_code_description }}</p>
+            <div class="text-center">
+                <img src="{% static 'images/palette.jpg' %}" alt="Цветовая палитра" class="dress-code-palette">
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-center mb-4">Детали</h2>
+            <div class="row g-4 justify-content-center">
+                {% for item in details %}
+                <div class="col-md-6 col-lg-4 fade-scroll">
+                    <div class="plan-card text-center h-100">
+                        <div class="plan-icon"><i class="bi bi-{{ item.icon }}"></i></div>
+                        <h5>{{ item.title }}</h5>
+                        <p class="small mb-0">{{ item.description }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section>
+            <div class="countdown-box fade-scroll">
+                <h3 class="mb-4">Ждём вас через</h3>
+                <div class="row g-3 justify-content-center">
+                    <div class="col-6 col-md-3">
+                        <div class="countdown-unit" id="days">--</div>
+                        <div class="countdown-label">дней</div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="countdown-unit" id="hours">--</div>
+                        <div class="countdown-label">часов</div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="countdown-unit" id="minutes">--</div>
+                        <div class="countdown-label">минут</div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="countdown-unit" id="seconds">--</div>
+                        <div class="countdown-label">секунд</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-center mb-4">Контакты</h2>
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4 fade-scroll">
+                    <div class="plan-card text-center h-100">
+                        <h5 class="mb-3">Жених</h5>
+                        <a href="tel:+79376568217" class="contact-phone d-block mb-1" data-phone="+79376568217" title="Нажмите, чтобы скопировать">+7 937 656 82 17</a>
+                        <a href="https://t.me/shelest_stfu" target="_blank" rel="noopener" class="contact-tg">@shelest_stfu</a>
+                    </div>
+                </div>
+                <div class="col-md-4 fade-scroll">
+                    <div class="plan-card text-center h-100">
+                        <h5 class="mb-3">Невеста</h5>
+                        <a href="tel:+79966221118" class="contact-phone d-block mb-1" data-phone="+79966221118" title="Нажмите, чтобы скопировать">+7 996 622 1118</a>
+                        <a href="https://t.me/fillandmoon" target="_blank" rel="noopener" class="contact-tg">@fillandmoon</a>
+                    </div>
+                </div>
+                <div class="col-md-4 fade-scroll">
+                    <div class="plan-card text-center h-100">
+                        <h5 class="mb-3">Координатор Рина</h5>
+                        <a href="tel:+79376470337" class="contact-phone d-block mb-1" data-phone="+79376470337" title="Нажмите, чтобы скопировать">+7 937 647 03 37</a>
+                        <a href="https://t.me/Rina_Sklyar" target="_blank" rel="noopener" class="contact-tg">@Rina_Sklyar</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="formSection">
+            <div class="form-section">
+                <h2 class="text-center mb-2">Анкета</h2>
+                <p class="text-center text-muted mb-4">Ответьте пожалуйста на несколько вопросов, которые мы для Вас подготовили</p>
+                <form id="invitationForm">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-12"><label class="form-label">{{ form.fio.label }}</label>{{ form.fio }}</div>
+                        <div class="col-12"><hr class="form-divider"></div>
+                        <div class="col-12">
+                            <label class="form-label">{{ form.will_attend.label }}</label>
+                            <div class="d-flex gap-3">
+                                {% for choice in form.will_attend %}
+                                <div class="form-check">{{ choice.tag }}<label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label></div>
+                                {% endfor %}
+                            </div>
+                            <div class="form-text">Остальные поля появятся после выбора «Да»</div>
+                        </div>
+                        <div id="formExtraFields" class="col-12" style="display: none;">
+                            <hr class="my-4 form-divider">
+                            <div class="row g-3">
+                                <div class="col-12"><label class="form-label">{{ form.fio_plus_one.label }}</label>{{ form.fio_plus_one }}</div>
+                            </div>
+                            <hr class="my-4 form-divider">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label">{{ form.alcohol_preferences.label }}</label>
+                                    <div class="row g-2">
+                                        {% for choice in form.alcohol_preferences %}
+                                        <div class="col-12 col-sm-6"><div class="form-check">{{ choice.tag }}<label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label></div></div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-12" id="customAlcoholWrap" style="display: none;"><label class="form-label">{{ form.custom_alcohol.label }}</label>{{ form.custom_alcohol }}</div>
+                            </div>
+                            <hr class="my-4 form-divider">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label">{{ form.non_alcohol_preferences.label }}</label>
+                                    <div class="row g-2">
+                                        {% for choice in form.non_alcohol_preferences %}
+                                        <div class="col-12 col-sm-6"><div class="form-check">{{ choice.tag }}<label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label></div></div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-12" id="customNonAlcoholWrap" style="display: none;"><label class="form-label">{{ form.custom_non_alcohol.label }}</label>{{ form.custom_non_alcohol }}</div>
+                            </div>
+                            <hr class="my-4 form-divider">
+                            <div class="row g-3">
+                                <div class="col-12"><div class="form-check">{{ form.overnight_stay }}<label class="form-check-label" for="id_overnight_stay">{{ form.overnight_stay.label }}</label></div></div>
+                                <div class="col-12"><div class="form-check">{{ form.transfer_to_venue }}<label class="form-check-label" for="id_transfer_to_venue">{{ form.transfer_to_venue.label }}</label></div></div>
+                                <div class="col-12"><div class="form-check">{{ form.transfer_home }}<label class="form-check-label" for="id_transfer_home">{{ form.transfer_home.label }}</label></div></div>
+                                <div class="col-12"><label class="form-label">{{ form.transfer_address.label }}</label>{{ form.transfer_address }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-lg" style="background: var(--wedding-gold); color: white; border: none;">Отправить</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal fade" id="thankYouModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                </div>
+                <div class="modal-body text-center py-4 pt-0">
+                    <i class="bi bi-heart-fill text-danger" style="font-size: 4rem;"></i>
+                    <h3 class="mt-3">Спасибо!</h3>
+                    <p class="text-muted mb-0" id="thankYouMessage"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const eventDate = new Date('{{ event_datetime }}');
+        const music = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicBtn');
+        const form = document.getElementById('invitationForm');
+        const thankYouModal = new bootstrap.Modal(document.getElementById('thankYouModal'));
+        let closeTimeout;
+
+        music.volume = 0.15;
+
+        const musicOverlay = document.getElementById('musicOverlay');
+        function startMusic() {
+            music.play().catch(() => {});
+            musicOverlay.classList.add('hidden');
+            setTimeout(() => musicOverlay.remove(), 600);
+        }
+        musicOverlay.addEventListener('click', startMusic, { once: true });
+
+        musicBtn.addEventListener('click', function() {
+            if (music.paused) {
+                music.play();
+                musicBtn.classList.remove('muted');
+                musicBtn.querySelector('i').className = 'bi bi-music-note-beamed';
+                musicBtn.title = 'Выключить музыку';
+            } else {
+                music.pause();
+                musicBtn.classList.add('muted');
+                musicBtn.querySelector('i').className = 'bi bi-music-note-beamed-fill';
+                musicBtn.title = 'Включить музыку';
+            }
+        });
+
+        function updateCountdown() {
+            const now = new Date();
+            const diff = eventDate - now;
+            if (diff <= 0) {
+                document.getElementById('days').textContent = '0';
+                document.getElementById('hours').textContent = '0';
+                document.getElementById('minutes').textContent = '0';
+                document.getElementById('seconds').textContent = '0';
+                return;
+            }
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            document.getElementById('days').textContent = days;
+            document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        const observerOptions = { threshold: 0.15, rootMargin: '0px 0px -80px 0px' };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+        }, observerOptions);
+        document.querySelectorAll('.fade-scroll').forEach(el => observer.observe(el));
+
+        const formExtraFields = document.getElementById('formExtraFields');
+        const willAttendRadios = form.querySelectorAll('input[name="will_attend"]');
+        function toggleExtraFields() {
+            const val = form.querySelector('input[name="will_attend"]:checked')?.value;
+            formExtraFields.style.display = val === 'true' ? 'block' : 'none';
+        }
+        willAttendRadios.forEach(r => r.addEventListener('change', toggleExtraFields));
+
+        const customAlcoholWrap = document.getElementById('customAlcoholWrap');
+        const customNonAlcoholWrap = document.getElementById('customNonAlcoholWrap');
+        form.querySelectorAll('input[name="alcohol_preferences"]').forEach(cb => {
+            cb.addEventListener('change', function() {
+                customAlcoholWrap.style.display = form.querySelector('input[name="alcohol_preferences"][value="custom"]:checked') ? 'block' : 'none';
+                if (!form.querySelector('input[name="alcohol_preferences"][value="custom"]:checked')) customAlcoholWrap.querySelector('input').value = '';
+            });
+        });
+        form.querySelectorAll('input[name="non_alcohol_preferences"]').forEach(cb => {
+            cb.addEventListener('change', function() {
+                customNonAlcoholWrap.style.display = form.querySelector('input[name="non_alcohol_preferences"][value="custom"]:checked') ? 'block' : 'none';
+                if (!form.querySelector('input[name="non_alcohol_preferences"][value="custom"]:checked')) customNonAlcoholWrap.querySelector('input').value = '';
+            });
+        });
+
+        document.querySelectorAll('.contact-phone').forEach(el => {
+            el.addEventListener('click', function(e) {
+                e.preventDefault();
+                const phone = this.dataset.phone || this.getAttribute('href').replace('tel:', '');
+                const linkEl = this;
+                navigator.clipboard.writeText(phone).then(() => {
+                    const orig = linkEl.textContent;
+                    linkEl.textContent = 'Скопировано!';
+                    setTimeout(() => linkEl.textContent = orig, 1500);
+                }).catch(() => {});
+            });
+        });
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (!form.querySelector('input[name="will_attend"]:checked')) {
+                alert('Пожалуйста, укажите, сможете ли вы присутствовать');
+                return;
+            }
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+            data.will_attend = data.will_attend || 'true';
+            data.overnight_stay = formData.has('overnight_stay');
+            data.transfer_to_venue = formData.has('transfer_to_venue');
+            data.transfer_home = formData.has('transfer_home');
+            data.alcohol_preferences = formData.getAll('alcohol_preferences');
+            data.non_alcohol_preferences = formData.getAll('non_alcohol_preferences');
+            data.csrfmiddlewaretoken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            try {
+                const res = await fetch('/api/submit/', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': data.csrfmiddlewaretoken, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const json = await res.json();
+                if (json.success) {
+                    const willAttend = data.will_attend === 'true' || data.will_attend === true;
+                    const msgEl = document.getElementById('thankYouMessage');
+                    msgEl.textContent = willAttend
+                        ? 'Ждём вас на нашем прекрасном празднике семьи! Детали встречи или какие-то необходимые напоминания будут отправлены вам лично чуть позже!'
+                        : 'Спасибо, что сообщили! Если передумаете, мы ждём ваше решение вплоть до месяца до начала торжества!';
+                    thankYouModal.show();
+                    clearTimeout(closeTimeout);
+                    closeTimeout = setTimeout(() => thankYouModal.hide(), 3000);
+                    const modalEl = document.getElementById('thankYouModal');
+                    const resetForm = () => form.reset();
+                    modalEl.addEventListener('hidden.bs.modal', resetForm, { once: true });
+                } else {
+                    alert('Ошибка при отправке. Проверьте заполнение полей.');
+                }
+            } catch (err) {
+                alert('Ошибка сети. Попробуйте позже.');
+            }
+        });
+    </script>
+</body>
+</html>
